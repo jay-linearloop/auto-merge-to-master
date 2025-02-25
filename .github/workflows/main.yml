@@ -1,0 +1,31 @@
+name: Auto Merge Stag to Master
+
+on:
+  pull_request:
+    branches:
+      - stag
+    types:
+      - closed
+
+jobs:
+  auto-merge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions Bot"
+
+      - name: Merge stag into master
+        run: |
+          git checkout main
+          git pull origin main
+          git merge --no-ff stag -m "Auto-merged stag into main"
+          git push origin main
