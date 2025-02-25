@@ -14,7 +14,7 @@ const port = process.env.API_PORT || 3000;
   app.use(express.json());
 
   app.get('/', (req, res) => {
-    res.send('Hello DevOps  Jayyy TESTING Auto Merge test-2   '  + process.env.MY_ENV_NAME);
+    res.send('Hello DevOps  Jayyy TESTING Auto Merge test-3  '  + process.env.MY_ENV_NAME);
   });
 
   app.listen(port, () => {
