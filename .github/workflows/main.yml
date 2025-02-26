@@ -1,4 +1,4 @@
-name: Sync Stag to main Without Keeping Author Info
+name: Sync Stag to Master Without Keeping Author Info
 
 on:
   pull_request:
@@ -18,20 +18,18 @@ jobs:
           ref: stag
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Configure Git Identity
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions Bot"
 
-
-      - name: Copy files to main without history
+      - name: Create a fresh commit on master
         run: |
-          git checkout --orphan temp-main
-          git rm -rf .
-          git reset --hard origin/stag
-          git add .
-          git commit -m "Synced stag to main without author history"
-          git branch -D main || true
-          git branch -m main
-          git push -f origin main
+          git checkout --orphan temp-main  # Create a new branch without history
+          git reset --hard origin/stag     # Reset the working tree to stag
+          git add .                         # Stage all files
+          git commit -m "Synced stag to master without author history"  # New commit
+          git branch -D master || true      # Delete old master branch
+          git branch -m master              # Rename temp-main to master
+          git push -f origin master         # Force push updated master
