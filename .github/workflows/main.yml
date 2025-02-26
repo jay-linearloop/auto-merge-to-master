@@ -1,4 +1,4 @@
-name: Auto Merge Stag to main
+name: Sync Stag to main Without Keeping Author Info
 
 on:
   pull_request:
@@ -8,13 +8,24 @@ on:
       - closed
 
 jobs:
-  auto-merge:
+  sync-clean:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
-      - name: Merge stag into main using GitHub API
+      - name: Checkout stag branch
+        uses: actions/checkout@v4
+        with:
+          ref: stag
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Copy files to main without history
         run: |
-          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-               -H "Accept: application/vnd.github.v3+json" \
-               https://api.github.com/repos/${{ github.repository }}/merges \
-               -d '{"base":"main","head":"stag"}'
+          git checkout --orphan temp-main
+          git rm -rf .
+          git reset --hard origin/stag
+          git add .
+          git commit -m "Synced stag to main without author history"
+          git branch -D main || true
+          git branch -m main
+          git push -f origin main
